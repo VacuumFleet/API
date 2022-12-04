@@ -16,7 +16,7 @@ timezone_paris = pytz.timezone('Europe/Paris')
 app = FastAPI(
     title='vacuumfleet-api',
     description="Cette API collecte diverses données des robots et régit les interactions entre app mobile et robot",
-    version='0.0.1',
+    version='0.0.2',
     license_info={
         'name':'The MIT License (MIT)', 
         'url' : 'https://mit-license.org/'
