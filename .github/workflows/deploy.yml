@@ -1,0 +1,59 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Run tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install nodejs npm
+          npm install
+          npm run test
+
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+      CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install ssh key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.CC_SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.CC_SSH_KEYSCAN_URL }}
+
+      - name: Install clever-tools
+        run: | 
+          sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys "379CE192D401AB61" 
+          echo "deb https://dl.bintray.com/clevercloud/deb stable main" | sudo tee -a /etc/apt/sources.list
+          sudo apt-get update
+          sudo apt-get install clever-tools
+
+      - name: Deploy main branch on Clever Cloud
+        if: github.ref == 'refs/heads/main' || github.head_ref == 'refs/heads/main'
+        run: |
+          clever link ${{ secrets.CC_APP_ID_DEV }} 
+          clever deploy --force
