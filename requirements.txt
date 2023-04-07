@@ -6,3 +6,4 @@ pytz==2022.1
 python-decouple==3.6
 passlib
 python-jose
+email-validator
