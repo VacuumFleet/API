@@ -1,0 +1,63 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Run tests
+        run: |
+          echo "Add test here"
+
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+      CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install ssh key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.CC_SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.CC_SSH_KEYSCAN_URL }}
+
+      - name: Install clever-tools
+        run: | 
+          curl -fsSL https://clever-tools.clever-cloud.com/gpg/cc-nexus-deb.public.gpg.key | gpg --dearmor -o /usr/share/keyrings/cc-nexus-deb.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/cc-nexus-deb.gpg] https://nexus.clever-cloud.com/repository/deb stable main" | sudo tee -a /etc/apt/sources.list
+          sudo apt-get update
+          sudo apt-get install clever-tools
+
+      - name: Deploy dev branch on Clever Cloud
+        if: github.ref == 'refs/heads/dev' || github.head_ref == 'refs/heads/dev'
+        run: |
+          clever link ${{ secrets.CC_APP_ID_DEV }} 
+          clever deploy --force
+
+      - name: Deploy main branch on Clever Cloud
+        if: github.ref == 'refs/heads/main' || github.head_ref == 'refs/heads/main'
+        run: |
+          clever link ${{ secrets.CC_APP_ID_PRD }} 
+          clever deploy --force
+
