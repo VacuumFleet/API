@@ -13,18 +13,6 @@ on:
       - dev
 
 jobs:
-  tests:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Run tests
-        run: |
-          echo "Add test here"
-
   deploy:
     runs-on: ubuntu-latest
     env:
@@ -60,4 +48,3 @@ jobs:
         run: |
           clever link ${{ secrets.CC_APP_ID_PRD }} 
           clever deploy --force
-
