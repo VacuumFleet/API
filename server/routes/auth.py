@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 from decouple import config
 from server.models.tokenModel import Token, TokenData
-from server.models.userModel import UserSchema, UserSchemaWithoutPwd
+from server.models.userModel import UserSchema
 import logging
 
 from server.database import (
@@ -32,6 +32,7 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return pwd_context.hash(password)
 
+
 async def authenticate_user(username: str, password: str):
     user = await retrieve_user_by_username_with_pwd(username)
     if not user:
@@ -39,6 +40,7 @@ async def authenticate_user(username: str, password: str):
     if not verify_password(password, user['password']):
         return False
     return user
+
 
 def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
     to_encode = data.copy()
@@ -49,6 +51,11 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+
+async def get_user(id: str):
+    if (user := await db["users"].find_one({"_id": id})) is not None:
+        return user
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     logging.debug("ingetcurrentuser")
@@ -70,10 +77,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
     return user
 
-async def get_current_active_user(current_user: UserSchemaWithoutPwd = Depends(get_current_user)):
-    # if current_user.disabled:
-    #     raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
 
 @router.post("/", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -90,9 +93,4 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-
-@router.get("/users/me/", response_model=UserSchemaWithoutPwd)
-async def read_users_me(current_user: UserSchemaWithoutPwd = Depends(get_current_active_user)):
-    logging.debug(current_user)
-    return current_user
 

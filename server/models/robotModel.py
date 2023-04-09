@@ -19,13 +19,11 @@ class PyObjectId(ObjectId):
     def __modify_schema__(cls, field_schema):
         field_schema.update(type="string")
 
-class UserSchema(BaseModel):
+class RobotModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    firstname: str = Field(...)
-    lastname: str = Field(...)
-    username: str = Field(...)
-    email: EmailStr = Field(...)
-    password: str = Field(...)
+    name: str = Field(...)
+    serial: str = Field(...)
+    user: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
@@ -33,34 +31,12 @@ class UserSchema(BaseModel):
         json_encoders = {ObjectId: str}
         schema_extra = {
             "example": {
-                "firstname": "John",
-                "lastname" : "Doe",
-                "username": "jdoe",
-                "email": "jdoe@example.com",
-                "password": "*****************"
+                "name": "beepboop",
+                "user": "id",
+                "serial": "1234",
             }
         }
 
-class UpdateUserModel(BaseModel):
-    firstname:  Optional[str]
-    lastname:  Optional[str]
-    username:  Optional[str]
-    email:  Optional[EmailStr]
-    password: Optional[str]
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-        schema_extra = {
-            "example": {
-                "firstname": "Hugo",
-                "lastname" : "Poissonnier",
-                "username": "HugoP",
-                "email": "jdoe@example.com",
-                "password": "*****************"
-            }
-        }
 
 def ResponseModel(data, message):
     return {

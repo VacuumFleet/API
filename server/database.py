@@ -84,3 +84,24 @@ async def delete_user(id: str):
     if user:
         await user_collection.delete_one({"_id": ObjectId(id)})
         return True
+
+robot_collection = database.get_collection("robot")
+
+def robot_helper(robot) -> dict:
+    return {
+        "id": str(robot["_id"]),
+        "name": robot["name"],
+        "user": robot["user"],
+        "serial": robot["serial"],
+    }
+
+async def add_robot(robot_data: dict) -> dict:
+    robot = await robot_collection.insert_one(robot_data)
+    new_robot = await robot_collection.find_one({"_id": robot.inserted_id})
+    return robot_helper(new_robot)
+
+async def retrieve_robots(user: str):
+    robots = []
+    async for robot in robot_collection.find({"user": user}):
+        robots.append(robot_helper(robot))
+    return robots

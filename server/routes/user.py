@@ -47,7 +47,7 @@ async def getUser(id):
     user = await retrieve_user(id)
     if(user):
         return ResponseModel(user, "User data retrieved successfully.")
-    return ErrorResponseModel("An error occurd",400, "User doesn't exist.")
+    return ErrorResponseModel("An error occurred",400, "User doesn't exist.")
 
 @router.put("/{id}", response_description="Update user")
 async def updateUser(id: str, user: UpdateUserModel = Body(...)):

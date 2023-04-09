@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import pytz
 from server.routes.user import router as UserRouter
 from server.routes.auth import router as TokenRouter
+from server.routes.robot import router as RobotRouter
 import logging
 FORMAT = "%(levelname)s:%(message)s"
 logging.basicConfig(format=FORMAT, level=logging.DEBUG)
@@ -26,6 +27,8 @@ app = FastAPI(
 app.include_router(UserRouter, tags=["User"], prefix="/user")
 
 app.include_router(TokenRouter, tags=["Token"], prefix="/token")
+
+app.include_router(RobotRouter, tags=["Robot"], prefix="/robot")
 
 @app.get("/", tags=["Root"])
 async def read_root():
