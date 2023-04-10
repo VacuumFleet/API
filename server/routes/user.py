@@ -1,8 +1,5 @@
-from datetime import timedelta
 from fastapi import APIRouter, Body
 from fastapi.encoders import jsonable_encoder
-from jose import JWTError, jwt
-from server.routes.auth import create_access_token, get_password_hash
 from decouple import config
 from server.database import (
     add_user,
@@ -22,32 +19,29 @@ ACCESS_TOKEN_EXPIRE_MINUTES = config("ACCESS_TOKEN_EXPIRE_MINUTES")
 
 router = APIRouter()
 
+
 @router.post("/", response_description="User data added into the database")
 async def createUser(user: UserSchema = Body(...)):
     user = jsonable_encoder(user)
     new_user = await add_user(user)
     return ResponseModel(new_user, "User added successfully.")
 
-@router.post("/signup", response_description="User signing up into database")
-async def createUser(user: UserSchema = Body(...)):
-    user.password = get_password_hash(user.password)
-    user = jsonable_encoder(user)
-    new_user = await add_user(user)
-    return ResponseModel(new_user, "User added successfully.")
 
 @router.get("/", response_description="Retrieve all users data")
 async def getUsers():
     users = await retrieve_users()
-    if(users):
+    if users:
         return ResponseModel(users, "Users data retrieved successfully.")
     return ResponseModel(users, "Empty list returned")
+
 
 @router.get("/{id}", response_description="User data retrieve")
 async def getUser(id):
     user = await retrieve_user(id)
-    if(user):
+    if user:
         return ResponseModel(user, "User data retrieved successfully.")
-    return ErrorResponseModel("An error occurd",400, "User doesn't exist.")
+    return ErrorResponseModel("An error occurred", 400, "User doesn't exist.")
+
 
 @router.put("/{id}", response_description="Update user")
 async def updateUser(id: str, user: UpdateUserModel = Body(...)):
@@ -63,6 +57,7 @@ async def updateUser(id: str, user: UpdateUserModel = Body(...)):
         404,
         "There was an error updating the user data.",
     )
+
 
 @router.delete("/{id}", response_description="User data deleted from the database")
 async def delete_user_data(id: str):

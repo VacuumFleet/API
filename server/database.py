@@ -1,5 +1,4 @@
 from bson import ObjectId
-from dotenv import load_dotenv
 import motor.motor_asyncio
 from decouple import config
 
@@ -11,14 +10,16 @@ database = client.vacuumfleet
 
 user_collection = database.get_collection("user")
 
+
 def user_helper(user) -> dict:
     return {
         "id": str(user["_id"]),
         "username": user["username"],
         "email": user["email"],
         "firstname": user["firstname"],
-        "lastname": user["lastname"]
+        "lastname": user["lastname"],
     }
+
 
 def user_helper_with_pwd(user) -> dict:
     return {
@@ -27,8 +28,9 @@ def user_helper_with_pwd(user) -> dict:
         "email": user["email"],
         "firstname": user["firstname"],
         "lastname": user["lastname"],
-        "password": user["password"]
+        "password": user["password"],
     }
+
 
 # Retrieve all users present in the database
 async def retrieve_users():
@@ -51,17 +53,20 @@ async def retrieve_user(id: str) -> dict:
     if user:
         return user_helper(user)
 
+
 # Retrieve a user with a matching Username
 async def retrieve_user_by_username(username: str) -> dict:
     user = await user_collection.find_one({"username": username})
     if user:
         return user_helper(user)
 
+
 # Retrieve a user with a matching Username with pwd
 async def retrieve_user_by_username_with_pwd(username: str) -> dict:
     user = await user_collection.find_one({"username": username})
     if user:
         return user_helper_with_pwd(user)
+
 
 # Update a user with a matching ID
 async def update_user(id: str, data: dict):
@@ -84,3 +89,28 @@ async def delete_user(id: str):
     if user:
         await user_collection.delete_one({"_id": ObjectId(id)})
         return True
+
+
+robot_collection = database.get_collection("robot")
+
+
+def robot_helper(robot) -> dict:
+    return {
+        "id": str(robot["_id"]),
+        "name": robot["name"],
+        "user": robot["user"],
+        "serial": robot["serial"],
+    }
+
+
+async def add_robot(robot_data: dict) -> dict:
+    robot = await robot_collection.insert_one(robot_data)
+    new_robot = await robot_collection.find_one({"_id": robot.inserted_id})
+    return robot_helper(new_robot)
+
+
+async def retrieve_robots(user: str):
+    robots = []
+    async for robot in robot_collection.find({"user": user}):
+        robots.append(robot_helper(robot))
+    return robots

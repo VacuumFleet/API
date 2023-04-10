@@ -1,18 +1,16 @@
 from datetime import datetime, timedelta
 from typing import Union
-from fastapi import APIRouter, Depends, FastAPI, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from pydantic import BaseModel
 from decouple import config
 from server.models.tokenModel import Token, TokenData
-from server.models.userModel import UserSchema, UserSchemaWithoutPwd
 import logging
 
 from server.database import (
     retrieve_user_by_username,
-    retrieve_user_by_username_with_pwd
+    retrieve_user_by_username_with_pwd,
 )
 
 SECRET_KEY = config("SECRET")
@@ -25,6 +23,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 router = APIRouter()
 
+
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
@@ -32,13 +31,15 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return pwd_context.hash(password)
 
+
 async def authenticate_user(username: str, password: str):
     user = await retrieve_user_by_username_with_pwd(username)
     if not user:
         return False
-    if not verify_password(password, user['password']):
+    if not verify_password(password, user["password"]):
         return False
     return user
+
 
 def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
     to_encode = data.copy()
@@ -49,6 +50,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     logging.debug("ingetcurrentuser")
@@ -70,10 +72,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
     return user
 
-async def get_current_active_user(current_user: UserSchemaWithoutPwd = Depends(get_current_user)):
-    # if current_user.disabled:
-    #     raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
 
 @router.post("/", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -86,13 +84,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         )
     access_token_expires = timedelta(minutes=int(ACCESS_TOKEN_EXPIRE_MINUTES))
     access_token = create_access_token(
-        data={"sub": user['username']}, expires_delta=access_token_expires
+        data={"sub": user["username"]}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
-
-
-@router.get("/users/me/", response_model=UserSchemaWithoutPwd)
-async def read_users_me(current_user: UserSchemaWithoutPwd = Depends(get_current_active_user)):
-    logging.debug(current_user)
-    return current_user
-
