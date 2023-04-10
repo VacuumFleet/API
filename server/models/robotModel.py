@@ -1,8 +1,6 @@
 from bson import ObjectId
-from pydantic import BaseModel, EmailStr, Field, SecretStr
-from typing import (
-    Optional
-)
+from pydantic import BaseModel, Field
+
 
 class PyObjectId(ObjectId):
     @classmethod
@@ -18,6 +16,7 @@ class PyObjectId(ObjectId):
     @classmethod
     def __modify_schema__(cls, field_schema):
         field_schema.update(type="string")
+
 
 class RobotModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")

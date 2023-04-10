@@ -5,12 +5,12 @@ from server.database import (
     retrieve_robots,
 )
 from server.models.robotModel import (
-    ErrorResponseModel,
     ResponseModel,
     RobotModel,
 )
 
 router = APIRouter()
+
 
 @router.post("/", response_description="Robot data added into the database")
 async def createRobot(robot: RobotModel = Body(...)):
@@ -18,9 +18,12 @@ async def createRobot(robot: RobotModel = Body(...)):
     new_robot = await add_robot(robot)
     return ResponseModel(new_robot, "Robot added successfully.")
 
-@router.get("/{user_id}", response_description="Retrieve all robots corresponding to a user")
+
+@router.get(
+    "/{user_id}", response_description="Retrieve all robots corresponding to a user"
+)
 async def getRobots(user_id):
     robots = await retrieve_robots(user_id)
-    if(robots):
+    if robots:
         return ResponseModel(robots, "Robots data retrieved successfully.")
     return ResponseModel(robots, "Empty list returned")

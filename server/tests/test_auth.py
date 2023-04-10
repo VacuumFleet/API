@@ -1,17 +1,16 @@
 import pytest
 from fastapi import HTTPException
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 
 from server.routes.auth import (
     authenticate_user,
     create_access_token,
     get_current_user,
     get_password_hash,
-    get_user,
-    verify_password,
 )
 
-pytest_plugins = ('pytest_asyncio',)
+pytest_plugins = ("pytest_asyncio",)
+
 
 @pytest.fixture
 def mock_db():
@@ -24,22 +23,6 @@ def mock_db():
             },
         ],
     }
-
-
-@pytest.mark.asyncio
-async def test_get_user_found(mock_db):
-    db_mock = AsyncMock(**mock_db)
-    result = await get_user("mock_id", db=db_mock)
-    assert result["_id"] == "mock_id"
-    assert result["username"] == "mock_username"
-    assert result["hashed_pass"] == get_password_hash("mock_password")
-
-
-@pytest.mark.asyncio
-async def test_get_user_not_found(mock_db):
-    db_mock = AsyncMock(**mock_db)
-    result = await get_user("unknown_id", db=db_mock)
-    assert result is None
 
 
 @pytest.mark.asyncio

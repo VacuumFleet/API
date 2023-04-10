@@ -1,8 +1,7 @@
 from bson import ObjectId
-from pydantic import BaseModel, EmailStr, Field, SecretStr
-from typing import (
-    Optional
-)
+from pydantic import BaseModel, EmailStr, Field
+from typing import Optional
+
 
 class PyObjectId(ObjectId):
     @classmethod
@@ -19,6 +18,7 @@ class PyObjectId(ObjectId):
     def __modify_schema__(cls, field_schema):
         field_schema.update(type="string")
 
+
 class UserSchema(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     firstname: str = Field(...)
@@ -34,18 +34,19 @@ class UserSchema(BaseModel):
         schema_extra = {
             "example": {
                 "firstname": "John",
-                "lastname" : "Doe",
+                "lastname": "Doe",
                 "username": "jdoe",
                 "email": "jdoe@example.com",
-                "password": "*****************"
+                "password": "*****************",
             }
         }
 
+
 class UpdateUserModel(BaseModel):
-    firstname:  Optional[str]
-    lastname:  Optional[str]
-    username:  Optional[str]
-    email:  Optional[EmailStr]
+    firstname: Optional[str]
+    lastname: Optional[str]
+    username: Optional[str]
+    email: Optional[EmailStr]
     password: Optional[str]
 
     class Config:
@@ -55,12 +56,13 @@ class UpdateUserModel(BaseModel):
         schema_extra = {
             "example": {
                 "firstname": "Hugo",
-                "lastname" : "Poissonnier",
+                "lastname": "Poissonnier",
                 "username": "HugoP",
                 "email": "jdoe@example.com",
-                "password": "*****************"
+                "password": "*****************",
             }
         }
+
 
 def ResponseModel(data, message):
     return {

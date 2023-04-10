@@ -1,7 +1,7 @@
 import pytest
-from bson import ObjectId
 from server.models.userModel import UserSchema, UpdateUserModel
 from server.models.tokenModel import Token, TokenData
+
 
 def test_create_user_model():
     user_dict = {
@@ -39,21 +39,24 @@ def test_update_user_model():
 def test_invalid_objectid():
     with pytest.raises(ValueError):
         bad_id = "not_an_objectid"
-        UserSchema(id=bad_id, firstname="John", lastname="Doe", username="jdoe", email="jdoes@mail.com", password="fakehashedsecret")
+        UserSchema(
+            id=bad_id,
+            firstname="John",
+            lastname="Doe",
+            username="jdoe",
+            email="jdoes@mail.com",
+            password="fakehashedsecret",
+        )
 
 
 def test_token_model():
-    token = {
-        "access_token": "fakeaccesstoken",
-        "token_type": "bearer"
-    }
+    token = {"access_token": "fakeaccesstoken", "token_type": "bearer"}
     token = Token(**token)
     assert token.access_token == "fakeaccesstoken"
     assert token.token_type == "bearer"
 
+
 def test_token_data_model():
-    token_data = {
-        "username": "jdoe"
-    }
+    token_data = {"username": "jdoe"}
     token_data = TokenData(**token_data)
     assert token_data.username == "jdoe"

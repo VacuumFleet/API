@@ -1,18 +1,16 @@
 from datetime import datetime, timedelta
 from typing import Union
-from fastapi import APIRouter, Depends, FastAPI, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from pydantic import BaseModel
 from decouple import config
 from server.models.tokenModel import Token, TokenData
-from server.models.userModel import UserSchema
 import logging
 
 from server.database import (
     retrieve_user_by_username,
-    retrieve_user_by_username_with_pwd
+    retrieve_user_by_username_with_pwd,
 )
 
 SECRET_KEY = config("SECRET")
@@ -24,6 +22,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 router = APIRouter()
+
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -37,7 +36,7 @@ async def authenticate_user(username: str, password: str):
     user = await retrieve_user_by_username_with_pwd(username)
     if not user:
         return False
-    if not verify_password(password, user['password']):
+    if not verify_password(password, user["password"]):
         return False
     return user
 
@@ -52,10 +51,6 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-
-async def get_user(id: str):
-    if (user := await db["users"].find_one({"_id": id})) is not None:
-        return user
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     logging.debug("ingetcurrentuser")
@@ -89,8 +84,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         )
     access_token_expires = timedelta(minutes=int(ACCESS_TOKEN_EXPIRE_MINUTES))
     access_token = create_access_token(
-        data={"sub": user['username']}, expires_delta=access_token_expires
+        data={"sub": user["username"]}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
-
-
