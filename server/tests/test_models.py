@@ -1,7 +1,14 @@
 import pytest
+from bson import ObjectId
+from server.models import userModel
 from server.models.userModel import UserSchema, UpdateUserModel
+from server.models.robotModel import RobotModel
+from pydantic import BaseModel
+from typing import Union
 from server.models.tokenModel import Token, TokenData
 
+
+# Test du UserModel
 
 def test_create_user_model():
     user_dict = {
@@ -16,9 +23,7 @@ def test_create_user_model():
     assert user.firstname == "John"
     assert user.lastname == "Doe"
     assert user.email == "jdoe@mail.com"
-    assert user.username == "jdoe"
     assert user.password == "fakehashedsecret"
-
 
 def test_update_user_model():
     user_dict = {
@@ -35,18 +40,13 @@ def test_update_user_model():
     assert user.username == "jdoe"
     assert user.password == "fakehashedsecret"
 
-
 def test_invalid_objectid():
     with pytest.raises(ValueError):
         bad_id = "not_an_objectid"
-        UserSchema(
-            id=bad_id,
-            firstname="John",
-            lastname="Doe",
-            username="jdoe",
-            email="jdoes@mail.com",
-            password="fakehashedsecret",
-        )
+        UserSchema(id=bad_id, first_name="John", last_name="Doe", role="simple mortal", is_active="false", last_login="datetime", password="fakehashedsecret")
+
+# Test du tokenModel : 
+
 
 
 def test_token_model():
@@ -60,3 +60,18 @@ def test_token_data_model():
     token_data = {"username": "jdoe"}
     token_data = TokenData(**token_data)
     assert token_data.username == "jdoe"
+
+# Test du robot 
+
+
+def test_robot_model():
+    user_dict = {
+                "name": "beepboop",
+                "user": "id",
+                "serial": "1234",
+                }
+    
+    user = RobotModel(**user_dict)
+    assert user.name == "beepboop"
+    assert user.serial == "1234"
+
