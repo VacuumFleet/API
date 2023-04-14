@@ -2,13 +2,18 @@ from bson import ObjectId
 import motor.motor_asyncio
 from decouple import config
 
+
+ACCESS_TOKEN_EXPIRE_MINUTES="30"
+ALGORITHM="HS256"
+DATABASE_NAME="vacuumfleet"
+MONGODB_URL="mongodb://localhost:27017"
+SECRET="awesomesecretkey"
+
 MONGODB_URL = config("MONGODB_URL")
-
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URL)
-
 database = client.vacuumfleet
+user_collection = database.get_collection("users")
 
-user_collection = database.get_collection("user")
 
 
 def user_helper(user) -> dict:
@@ -49,7 +54,7 @@ async def add_user(user_data: dict) -> dict:
 
 # Retrieve a user with a matching ID
 async def retrieve_user(id: str) -> dict:
-    user = await user_collection.find_one({"_id": ObjectId(id)})
+    user = await user_collection.find_one({"_id": id})
     if user:
         return user_helper(user)
 
@@ -73,7 +78,7 @@ async def update_user(id: str, data: dict):
     # Return false if an empty request body is sent.
     if len(data) < 1:
         return False
-    user = await user_collection.find_one({"_id": ObjectId(id)})
+    user = await user_collection.find_one({"_id": id})
     if user:
         updated_user = await user_collection.update_one(
             {"_id": ObjectId(id)}, {"$set": data}
@@ -85,9 +90,9 @@ async def update_user(id: str, data: dict):
 
 # Delete a user from the database
 async def delete_user(id: str):
-    user = await user_collection.find_one({"_id": ObjectId(id)})
+    user = await user_collection.find_one({"_id": id})
     if user:
-        await user_collection.delete_one({"_id": ObjectId(id)})
+        await user_collection.delete_one({"_id": id})
         return True
 
 
