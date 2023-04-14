@@ -9,7 +9,14 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from decouple import config
 from server.models.tokenModel import Token, TokenData
-from server.routes.auth import verify_password, get_password_hash,authenticate_user, retrieve_user_by_username_with_pwd,create_access_token, get_current_user
+from server.routes.auth import (
+    verify_password,
+    get_password_hash,
+    authenticate_user,
+    retrieve_user_by_username_with_pwd,
+    create_access_token,
+    get_current_user,
+)
 import logging
 import asyncio
 from fastapi.testclient import TestClient
@@ -18,7 +25,6 @@ from decouple import config
 
 import unittest
 from fastapi import FastAPI
-
 
 
 # from pytest import asyncio
@@ -31,6 +37,9 @@ from server.database import (
     retrieve_user_by_username,
     retrieve_user_by_username_with_pwd,
 )
+from server.app import (
+    app,
+)
 
 SECRET_KEY = config("SECRET")
 ALGORITHM = config("ALGORITHM")
@@ -42,14 +51,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 router = APIRouter()
 
-app = FastAPI(
-    title="vacuumfleet-api",
-    description="Cette API collecte diverses données des robots et régit les interactions entre app mobile et robot",
-    version="0.0.2",
-    license_info={"name": "The MIT License (MIT)", "url": "https://mit-license.org/"},
-)
-
 client = TestClient(app)
+
 
 def test_verify_password():
     plain_password = "myPassword123"
@@ -66,13 +69,14 @@ def test_get_password_hash():
     assert len(hashed_password) > 0
     assert hashed_password != password
 
+
 def test_create_access_token():
     # Define test data
     data = {"sub": "1234567890", "username": "PP"}
-    
+
     # Call the function to create an access token
     access_token = create_access_token(data).encode()
-    
+
     # Check that the access token was created successfully
     assert isinstance(access_token, bytes)
     assert access_token != ""
@@ -93,11 +97,18 @@ async def test_get_current_user():
     except HTTPException as e:
         assert e.status_code == 401
 
+
 def test_login():
-    response = client.post("/token/", json={"username": "jdoe", "password": "secret1"},
-                        headers={"content-type": "application/x-www-form-urlencoded"})
+    response = client.post(
+        "/token/",
+        data={
+            "username": "jdoe",
+            "password": "secret1",
+        },
+        headers={"content-type": "application/x-www-form-urlencoded"},
+    )
     assert response.status_code == 200
     response_data = response.json()
     assert "access_token" in response_data
-    assert "token_type" == "bearer"
+    assert "token_type" in response_data
     return response_data["token_type"], response_data["access_token"]
