@@ -30,8 +30,6 @@ app.include_router(TokenRouter, tags=["Token"], prefix="/token")
 app.include_router(RobotRouter, tags=["Robot"], prefix="/robot")
 
 
-
-
 @app.get("/", tags=["Root"])
 async def read_root():
     return {"message": "Welcome to this fantastic app!"}

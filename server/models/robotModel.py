@@ -2,6 +2,7 @@ from bson import ObjectId
 from pydantic import BaseModel, Field
 from typing import Optional
 
+
 class PyObjectId(ObjectId):
     @classmethod
     def __get_validators__(cls):
@@ -34,6 +35,7 @@ class Robot(BaseModel):
             }
         }
 
+
 class RobotInDB(Robot):
     user: str = Field(...)
 
@@ -51,6 +53,7 @@ class RobotUpdateModel(BaseModel):
             }
         }
 
+
 def ResponseModel(data, message):
     return {
         "data": [data],
@@ -60,5 +63,4 @@ def ResponseModel(data, message):
 
 
 def ErrorResponseModel(error, code, message):
-    return {}
     return {"error": error, "code": code, "message": message}

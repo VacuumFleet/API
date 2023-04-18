@@ -114,11 +114,10 @@ async def retrieve_robots_user(user: str):
         robots.append(robot_helper(robot))
     return robots
 
-async def retrieve_robots():
-    robots = []
-    async for robot in robot_collection.find():
-        robots.append(robot_helper(robot))
-    return robots
+async def retrieve_robot(id: str):
+    robot = await robot_collection.find_one({"_id": id})
+    if robot:
+        return robot_helper(robot)
 
 async def update_robot_user(id: str, user: User, data: dict):
     if len(data) < 1:
