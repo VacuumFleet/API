@@ -1,6 +1,9 @@
+import logging
 from bson import ObjectId
 import motor.motor_asyncio
 from decouple import config
+from server.models.robotModel import RobotInDB
+from server.models.userModel import User, UserInDB
 
 
 ACCESS_TOKEN_EXPIRE_MINUTES="30"
@@ -16,14 +19,8 @@ user_collection = database.get_collection("users")
 
 
 
-def user_helper(user) -> dict:
-    return {
-        "id": str(user["_id"]),
-        "username": user["username"],
-        "email": user["email"],
-        "firstname": user["firstname"],
-        "lastname": user["lastname"],
-    }
+def user_helper(user) -> UserInDB:
+    return UserInDB(**user)
 
 
 def user_helper_with_pwd(user) -> dict:
@@ -81,10 +78,12 @@ async def update_user(id: str, data: dict):
     user = await user_collection.find_one({"_id": id})
     if user:
         updated_user = await user_collection.update_one(
-            {"_id": ObjectId(id)}, {"$set": data}
+            {"_id": id}, {"$set": data}
         )
         if updated_user:
             return True
+        return False
+    else:
         return False
 
 
@@ -99,13 +98,8 @@ async def delete_user(id: str):
 robot_collection = database.get_collection("robot")
 
 
-def robot_helper(robot) -> dict:
-    return {
-        "id": str(robot["_id"]),
-        "name": robot["name"],
-        "user": robot["user"],
-        "serial": robot["serial"],
-    }
+def robot_helper(robot) -> RobotInDB:
+    return RobotInDB(**robot)
 
 
 async def add_robot(robot_data: dict) -> dict:
@@ -114,8 +108,29 @@ async def add_robot(robot_data: dict) -> dict:
     return robot_helper(new_robot)
 
 
-async def retrieve_robots(user: str):
+async def retrieve_robots_user(user: str):
     robots = []
     async for robot in robot_collection.find({"user": user}):
         robots.append(robot_helper(robot))
     return robots
+
+async def retrieve_robots():
+    robots = []
+    async for robot in robot_collection.find():
+        robots.append(robot_helper(robot))
+    return robots
+
+async def update_robot_user(id: str, user: User, data: dict):
+    if len(data) < 1:
+        return False
+    robot = await robot_collection.find_one({"_id": id, "user": str(user.id)})
+    if robot:
+        updated_robot = await robot_collection.update_one(
+            {"_id": id}, {"$set": data}
+        )
+        if updated_robot:
+            return True
+        return False
+    else:
+        return False
+    

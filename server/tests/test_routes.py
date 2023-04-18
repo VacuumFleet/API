@@ -19,7 +19,7 @@ from server.database import (
 from server.models.userModel import (
     ErrorResponseModel,
     ResponseModel,
-    UserSchema,
+    User,
     UpdateUserModel,
 )
 

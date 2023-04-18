@@ -11,8 +11,9 @@ from server.database import (
 from server.models.userModel import (
     ErrorResponseModel,
     ResponseModel,
-    UserSchema,
+    User,
     UpdateUserModel,
+    UserInDB,
 )
 
 from server.routes.auth import (
@@ -26,7 +27,7 @@ router = APIRouter()
 
 
 @router.post("/", response_description="User data added into the database")
-async def createUser(user: UserSchema = Body(...)):
+async def createUser(user: UserInDB = Body(...)):
     user.password = get_password_hash(user.password)
     user = jsonable_encoder(user)
     new_user = await add_user(user)

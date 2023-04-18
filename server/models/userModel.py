@@ -19,13 +19,12 @@ class PyObjectId(ObjectId):
         field_schema.update(type="string")
 
 
-class UserSchema(BaseModel):
+class User(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     firstname: str = Field(...)
     lastname: str = Field(...)
     username: str = Field(...)
     email: EmailStr = Field(...)
-    password: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
@@ -37,17 +36,18 @@ class UserSchema(BaseModel):
                 "lastname": "Doe",
                 "username": "jdoe",
                 "email": "jdoe@example.com",
-                "password": "*****************",
+                "password": "password",
             }
         }
 
+class UserInDB(User):
+    password: str
 
 class UpdateUserModel(BaseModel):
     firstname: Optional[str]
     lastname: Optional[str]
     username: Optional[str]
     email: Optional[EmailStr]
-    password: Optional[str]
 
     class Config:
         allow_population_by_field_name = True
@@ -59,7 +59,6 @@ class UpdateUserModel(BaseModel):
                 "lastname": "Poissonnier",
                 "username": "HugoP",
                 "email": "jdoe@example.com",
-                "password": "*****************",
             }
         }
 

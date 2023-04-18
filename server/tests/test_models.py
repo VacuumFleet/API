@@ -1,8 +1,8 @@
 import pytest
 from bson import ObjectId
 from server.models import userModel
-from server.models.userModel import UserSchema, UpdateUserModel
-from server.models.robotModel import RobotModel
+from server.models.userModel import User, UpdateUserModel, UserInDB
+from server.models.robotModel import Robot, RobotInDB
 from pydantic import BaseModel
 from typing import Union
 from server.models.tokenModel import Token, TokenData
@@ -18,7 +18,7 @@ def test_create_user_model():
         "username": "jdoe",
         "password": "fakehashedsecret",
     }
-    user = UserSchema(**user_dict)
+    user = UserInDB(**user_dict)
     assert user.id
     assert user.firstname == "John"
     assert user.lastname == "Doe"
@@ -43,7 +43,7 @@ def test_update_user_model():
 def test_invalid_objectid():
     with pytest.raises(ValueError):
         bad_id = "not_an_objectid"
-        UserSchema(id=bad_id, first_name="John", last_name="Doe", role="simple mortal", is_active="false", last_login="datetime", password="fakehashedsecret")
+        User(id=bad_id, first_name="John", last_name="Doe", role="simple mortal", is_active="false", last_login="datetime", password="fakehashedsecret")
 
 # Test du tokenModel : 
 
@@ -71,7 +71,7 @@ def test_robot_model():
                 "serial": "1234",
                 }
     
-    user = RobotModel(**user_dict)
+    user = RobotInDB(**user_dict)
     assert user.name == "beepboop"
     assert user.serial == "1234"
 

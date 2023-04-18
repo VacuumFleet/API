@@ -4,7 +4,7 @@ import motor.motor_asyncio
 from server.database import add_user, retrieve_user
 import pytest
 
-from server.models.userModel import UserSchema
+from server.models.userModel import UserInDB
 
 async def async_open_db():
     client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://localhost:27017")
@@ -14,7 +14,7 @@ async def async_open_db():
 @pytest.mark.asyncio
 async def test_add_user():
     # Créer un utilisateur pour le test
-    user = UserSchema(
+    user = UserInDB(
         firstname="John",
         lastname="Doe",
         email="jdoe@mail.com",
