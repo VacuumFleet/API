@@ -1,6 +1,7 @@
+from typing import Optional
+
 from bson import ObjectId
 from pydantic import BaseModel, Field
-from typing import Optional
 
 
 class PyObjectId(ObjectId):
@@ -56,7 +57,7 @@ class RobotUpdateModel(BaseModel):
 
 def ResponseModel(data, message):
     return {
-        "data": [data],
+        "data": data,
         "code": 200,
         "message": message,
     }

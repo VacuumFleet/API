@@ -1,31 +1,25 @@
 import asyncio
-import logging
-import queue
-from fastapi import (
-    APIRouter,
-    Body,
-    Depends,
-    WebSocket,
-    WebSocketDisconnect,
-)
+from typing import Annotated
+
+from fastapi import APIRouter, Body, Depends, WebSocket, WebSocketDisconnect
 from fastapi.encoders import jsonable_encoder
+from websockets.exceptions import ConnectionClosedOK
+
 from server.database import (
     add_robot,
     retrieve_robot,
     retrieve_robots_user,
     update_robot_user,
 )
-from server.models.userModel import User
 from server.models.robotModel import (
     ErrorResponseModel,
     ResponseModel,
-    RobotInDB,
     Robot,
+    RobotInDB,
     RobotUpdateModel,
 )
+from server.models.userModel import User
 from server.routes.auth import get_current_user
-from typing import Annotated
-from websockets.exceptions import ConnectionClosedOK
 
 router = APIRouter()
 
