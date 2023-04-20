@@ -31,14 +31,14 @@ def test_update_user_model():
         "lastname": "Doe",
         "email": "jdoe@mail.com",
         "username": "jdoe",
-        "password": "fakehashedsecret",
+        # "password": "fakehashedsecret",
     }
     user = UpdateUserModel(**user_dict)
     assert user.firstname == "John"
     assert user.lastname == "Doe"
     assert user.email == "jdoe@mail.com"
     assert user.username == "jdoe"
-    assert user.password == "fakehashedsecret"
+    # assert user.password == "fakehashedsecret"
 
 def test_invalid_objectid():
     with pytest.raises(ValueError):

@@ -16,7 +16,7 @@ MONGODB_URL = config("MONGODB_URL")
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URL)
 database = client.vacuumfleet
 user_collection = database.get_collection("users")
-
+robot_collection = database.get_collection("robot")
 
 
 def user_helper(user) -> UserInDB:
