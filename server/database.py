@@ -1,20 +1,21 @@
 import logging
-from bson import ObjectId
+
 import motor.motor_asyncio
+from bson import ObjectId
 from decouple import config
+
 from server.models.robotModel import RobotInDB
 from server.models.userModel import User, UserInDB
 
-
-ACCESS_TOKEN_EXPIRE_MINUTES="30"
-ALGORITHM="HS256"
-DATABASE_NAME="vacuumfleet"
-MONGODB_URL="mongodb://localhost:27017"
-SECRET="awesomesecretkey"
+ACCESS_TOKEN_EXPIRE_MINUTES = "30"
+ALGORITHM = "HS256"
+DATABASE_NAME = config("DATABASE_NAME")
+MONGODB_URL = config("MONGODB_URL")
+SECRET = config("SECRET")
 
 MONGODB_URL = config("MONGODB_URL")
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URL)
-database = client.vacuumfleet
+database = client.by6n3mnrj30iuodgptgs
 user_collection = database.get_collection("users")
 robot_collection = database.get_collection("robot")
 
@@ -77,9 +78,7 @@ async def update_user(id: str, data: dict):
         return False
     user = await user_collection.find_one({"_id": id})
     if user:
-        updated_user = await user_collection.update_one(
-            {"_id": id}, {"$set": data}
-        )
+        updated_user = await user_collection.update_one({"_id": id}, {"$set": data})
         if updated_user:
             return True
         return False
@@ -114,22 +113,21 @@ async def retrieve_robots_user(user: str):
         robots.append(robot_helper(robot))
     return robots
 
+
 async def retrieve_robot(id: str):
     robot = await robot_collection.find_one({"_id": id})
     if robot:
         return robot_helper(robot)
+
 
 async def update_robot_user(id: str, user: User, data: dict):
     if len(data) < 1:
         return False
     robot = await robot_collection.find_one({"_id": id, "user": str(user.id)})
     if robot:
-        updated_robot = await robot_collection.update_one(
-            {"_id": id}, {"$set": data}
-        )
+        updated_robot = await robot_collection.update_one({"_id": id}, {"$set": data})
         if updated_robot:
             return True
         return False
     else:
         return False
-    
