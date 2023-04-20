@@ -1,6 +1,7 @@
+from typing import Optional
+
 from bson import ObjectId
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
 
 
 class PyObjectId(ObjectId):
@@ -40,8 +41,10 @@ class User(BaseModel):
             }
         }
 
+
 class UserInDB(User):
     password: str
+
 
 class UpdateUserModel(BaseModel):
     firstname: Optional[str]

@@ -1,6 +1,7 @@
+from decouple import config
 from fastapi import APIRouter, Body
 from fastapi.encoders import jsonable_encoder
-from decouple import config
+
 from server.database import (
     add_user,
     delete_user,
@@ -11,15 +12,11 @@ from server.database import (
 from server.models.userModel import (
     ErrorResponseModel,
     ResponseModel,
-    User,
     UpdateUserModel,
+    User,
     UserInDB,
 )
-
-from server.routes.auth import (
-    get_password_hash,
-)
-
+from server.routes.auth import get_password_hash
 
 ACCESS_TOKEN_EXPIRE_MINUTES = config("ACCESS_TOKEN_EXPIRE_MINUTES")
 

@@ -1,17 +1,18 @@
+import logging
 from datetime import datetime, timedelta
 from typing import Annotated, Union
+
+from decouple import config
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from decouple import config
-from server.models.tokenModel import Token, TokenData
-import logging
 
 from server.database import (
     retrieve_user_by_username,
     retrieve_user_by_username_with_pwd,
 )
+from server.models.tokenModel import Token, TokenData
 from server.models.userModel import User
 
 SECRET_KEY = config("SECRET")
