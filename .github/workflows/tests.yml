@@ -6,6 +6,13 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
+      ALGORITHM: ${{ secrets.ALGORITHM }}
+      DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+      MONGODB_URL: ${{ secrets.MONGODB_URL }}
+      SECRET: ${{ secrets.SECRET }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
     strategy:
       matrix:
         python-version: ["3.10"]

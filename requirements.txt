@@ -11,6 +11,7 @@ python-multipart
 pytest-asyncio
 requests
 bcrypt
+<<<<<<< HEAD
 anyio              3.6.2
 bcrypt             4.0.1
 certifi            2022.12.7
@@ -51,3 +52,7 @@ typing_extensions  4.5.0
 urllib3            1.26.15
 uvicorn            0.18.2
 wheel              0.40.0
+=======
+websockets
+httpx
+>>>>>>> 704c683b6bdf35cdb3909ad450fe51524edf9023
