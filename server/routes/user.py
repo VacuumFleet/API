@@ -1,6 +1,7 @@
+from decouple import config
 from fastapi import APIRouter, Body
 from fastapi.encoders import jsonable_encoder
-from decouple import config
+
 from server.database import (
     add_user,
     delete_user,
@@ -11,9 +12,11 @@ from server.database import (
 from server.models.userModel import (
     ErrorResponseModel,
     ResponseModel,
-    UserSchema,
     UpdateUserModel,
+    User,
+    UserInDB,
 )
+from server.routes.auth import get_password_hash
 
 ACCESS_TOKEN_EXPIRE_MINUTES = config("ACCESS_TOKEN_EXPIRE_MINUTES")
 
@@ -21,7 +24,8 @@ router = APIRouter()
 
 
 @router.post("/", response_description="User data added into the database")
-async def createUser(user: UserSchema = Body(...)):
+async def createUser(user: UserInDB = Body(...)):
+    user.password = get_password_hash(user.password)
     user = jsonable_encoder(user)
     new_user = await add_user(user)
     return ResponseModel(new_user, "User added successfully.")

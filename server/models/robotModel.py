@@ -1,3 +1,5 @@
+from typing import Optional
+
 from bson import ObjectId
 from pydantic import BaseModel, Field
 
@@ -18,11 +20,10 @@ class PyObjectId(ObjectId):
         field_schema.update(type="string")
 
 
-class RobotModel(BaseModel):
+class Robot(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
     serial: str = Field(...)
-    user: str = Field(...)
 
     class Config:
         allow_population_by_field_name = True
@@ -31,20 +32,36 @@ class RobotModel(BaseModel):
         schema_extra = {
             "example": {
                 "name": "beepboop",
-                "user": "id",
                 "serial": "1234",
+            }
+        }
+
+
+class RobotInDB(Robot):
+    user: str = Field(...)
+
+
+class RobotUpdateModel(BaseModel):
+    name: Optional[str]
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        schema_extra = {
+            "example": {
+                "name": "beepboop",
             }
         }
 
 
 def ResponseModel(data, message):
     return {
-        "data": [data],
+        "data": data,
         "code": 200,
         "message": message,
     }
 
 
 def ErrorResponseModel(error, code, message):
-    return {}
     return {"error": error, "code": code, "message": message}

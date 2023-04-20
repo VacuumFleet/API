@@ -1,17 +1,19 @@
+import logging
 from datetime import datetime, timedelta
-from typing import Union
+from typing import Annotated, Union
+
+from decouple import config
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from decouple import config
-from server.models.tokenModel import Token, TokenData
-import logging
 
 from server.database import (
     retrieve_user_by_username,
     retrieve_user_by_username_with_pwd,
 )
+from server.models.tokenModel import Token, TokenData
+from server.models.userModel import User
 
 SECRET_KEY = config("SECRET")
 ALGORITHM = config("ALGORITHM")
@@ -52,8 +54,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    logging.debug("ingetcurrentuser")
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -74,7 +75,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
 
 @router.post("/", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login_for_access_token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+):
     user = await authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(

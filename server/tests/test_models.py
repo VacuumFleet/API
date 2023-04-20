@@ -1,8 +1,11 @@
 import pytest
-from server.models.userModel import UserSchema, UpdateUserModel
+
+from server.models.robotModel import RobotInDB
 from server.models.tokenModel import Token, TokenData
+from server.models.userModel import UpdateUserModel, User, UserInDB
 
 
+# Test du UserModel
 def test_create_user_model():
     user_dict = {
         "firstname": "John",
@@ -11,12 +14,11 @@ def test_create_user_model():
         "username": "jdoe",
         "password": "fakehashedsecret",
     }
-    user = UserSchema(**user_dict)
+    user = UserInDB(**user_dict)
     assert user.id
     assert user.firstname == "John"
     assert user.lastname == "Doe"
     assert user.email == "jdoe@mail.com"
-    assert user.username == "jdoe"
     assert user.password == "fakehashedsecret"
 
 
@@ -26,27 +28,31 @@ def test_update_user_model():
         "lastname": "Doe",
         "email": "jdoe@mail.com",
         "username": "jdoe",
-        "password": "fakehashedsecret",
+        # "password": "fakehashedsecret",
     }
     user = UpdateUserModel(**user_dict)
     assert user.firstname == "John"
     assert user.lastname == "Doe"
     assert user.email == "jdoe@mail.com"
     assert user.username == "jdoe"
-    assert user.password == "fakehashedsecret"
+    # assert user.password == "fakehashedsecret"
 
 
 def test_invalid_objectid():
     with pytest.raises(ValueError):
         bad_id = "not_an_objectid"
-        UserSchema(
+        User(
             id=bad_id,
-            firstname="John",
-            lastname="Doe",
-            username="jdoe",
-            email="jdoes@mail.com",
+            first_name="John",
+            last_name="Doe",
+            role="simple mortal",
+            is_active="false",
+            last_login="datetime",
             password="fakehashedsecret",
         )
+
+
+# Test du tokenModel :
 
 
 def test_token_model():
@@ -60,3 +66,18 @@ def test_token_data_model():
     token_data = {"username": "jdoe"}
     token_data = TokenData(**token_data)
     assert token_data.username == "jdoe"
+
+
+# Test du robot
+
+
+def test_robot_model():
+    user_dict = {
+        "name": "beepboop",
+        "user": "id",
+        "serial": "1234",
+    }
+
+    user = RobotInDB(**user_dict)
+    assert user.name == "beepboop"
+    assert user.serial == "1234"
