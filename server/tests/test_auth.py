@@ -1,44 +1,16 @@
 import pytest
-import asyncio
-import motor.motor_asyncio
-from datetime import datetime, timedelta
-from typing import Union
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWTError, jwt
-from passlib.context import CryptContext
 from decouple import config
-from server.models.tokenModel import Token, TokenData
+from fastapi import HTTPException
+from fastapi.security import OAuth2PasswordBearer
+from fastapi.testclient import TestClient
+from passlib.context import CryptContext
+
+from server.app import app
 from server.routes.auth import (
-    verify_password,
-    get_password_hash,
-    authenticate_user,
-    retrieve_user_by_username_with_pwd,
     create_access_token,
     get_current_user,
-)
-import logging
-import asyncio
-from fastapi.testclient import TestClient
-from bson import ObjectId
-from decouple import config
-
-import unittest
-from fastapi import FastAPI
-
-
-# from pytest import asyncio
-import pytest
-from fastapi import HTTPException
-from unittest.mock import AsyncMock, patch
-
-
-from server.database import (
-    retrieve_user_by_username,
-    retrieve_user_by_username_with_pwd,
-)
-from server.app import (
-    app,
+    get_password_hash,
+    verify_password,
 )
 
 SECRET_KEY = config("SECRET")
@@ -48,8 +20,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = config("ACCESS_TOKEN_EXPIRE_MINUTES")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-router = APIRouter()
 
 client = TestClient(app)
 

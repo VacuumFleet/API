@@ -1,15 +1,11 @@
 import pytest
-from bson import ObjectId
-from server.models import userModel
-from server.models.userModel import User, UpdateUserModel, UserInDB
-from server.models.robotModel import Robot, RobotInDB
-from pydantic import BaseModel
-from typing import Union
+
+from server.models.robotModel import RobotInDB
 from server.models.tokenModel import Token, TokenData
+from server.models.userModel import UpdateUserModel, User, UserInDB
 
 
 # Test du UserModel
-
 def test_create_user_model():
     user_dict = {
         "firstname": "John",
@@ -24,6 +20,7 @@ def test_create_user_model():
     assert user.lastname == "Doe"
     assert user.email == "jdoe@mail.com"
     assert user.password == "fakehashedsecret"
+
 
 def test_update_user_model():
     user_dict = {
@@ -40,13 +37,22 @@ def test_update_user_model():
     assert user.username == "jdoe"
     # assert user.password == "fakehashedsecret"
 
+
 def test_invalid_objectid():
     with pytest.raises(ValueError):
         bad_id = "not_an_objectid"
-        User(id=bad_id, first_name="John", last_name="Doe", role="simple mortal", is_active="false", last_login="datetime", password="fakehashedsecret")
+        User(
+            id=bad_id,
+            first_name="John",
+            last_name="Doe",
+            role="simple mortal",
+            is_active="false",
+            last_login="datetime",
+            password="fakehashedsecret",
+        )
 
-# Test du tokenModel : 
 
+# Test du tokenModel :
 
 
 def test_token_model():
@@ -61,17 +67,17 @@ def test_token_data_model():
     token_data = TokenData(**token_data)
     assert token_data.username == "jdoe"
 
-# Test du robot 
+
+# Test du robot
 
 
 def test_robot_model():
     user_dict = {
-                "name": "beepboop",
-                "user": "id",
-                "serial": "1234",
-                }
-    
+        "name": "beepboop",
+        "user": "id",
+        "serial": "1234",
+    }
+
     user = RobotInDB(**user_dict)
     assert user.name == "beepboop"
     assert user.serial == "1234"
-
